@@ -1,7 +1,12 @@
 --[[
 -- Whitelist mod by ShadowNinja
+-- Uses dedecated priv and toggle thanks to CWz
 -- License: WTFPL
 --]]
+minetest.register_privilege("whitelist", {
+	description = "may add new names to whitelist.",
+	give_to_singleplayer= false,
+})
 
 local worldpath = minetest.get_worldpath()
 local whitelist = {}
@@ -32,7 +37,7 @@ end
 load_whitelist()
 
 minetest.register_on_prejoinplayer(function(name, ip)
-	if name == admin or name == "singleplayer" then
+	if name == admin or name == "singleplayer" or minetest.setting_getbool("lockdown") == false then
 		return
 	end
 	for _, whitename in pairs(whitelist) do
@@ -46,7 +51,7 @@ end)
 minetest.register_chatcommand("whitelist", {
 	params = "{add|remove} <nick>",
 	help = "Manipulate the whitelist",
-	privs = {ban=true},
+	privs = {whitelist=true},
 	func = function(name, param)
 		local action, whitename = param:match("^([^ ]+) ([^ ]+)$")
 		if action == "add" then
@@ -86,4 +91,3 @@ minetest.register_chatcommand("whitelist", {
 		end
 	end,
 })
-
